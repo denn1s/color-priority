@@ -66,6 +66,38 @@ Try deliberately breaking the hierarchy: make the surface loud, flatten all prio
 
 ---
 
+## Salience vs. Preference
+
+The Visual Priority Map offers two tabs that measure fundamentally different things.
+
+### Salience — "What grabs your eye?"
+
+Salience measures involuntary attention capture: which color a user's eye lands on first, before conscious thought kicks in. The formula is contrast-dominant. A color that doesn't stand out from the background can't be salient no matter how vivid its hue. Once contrast is established, saturation and hue amplify the effect.
+
+The hue salience curve peaks at red (evolutionary alertness signals — danger, blood, ripe fruit) with a secondary peak at blue. Green and yellow-green sit at the bottom. This aligns with attentional research showing that warm, high-contrast colors trigger faster reaction times.
+
+A practical consequence: pure blue (#0000FF) scores higher than pure red (#FF0000) on a white background in salience mode. This is not a bug. Blue has a much higher luminance contrast against white (8.6:1 vs 4.0:1) because human vision weights green heavily in luminance calculations, making pure blue appear very dark. Contrast is the gate — even a "loud" hue can't win if it doesn't visually separate from its background.
+
+### Preference — "What do people find pleasing?"
+
+Preference is based on the findings of Camgoz, Yener, and Guvenc (2002), who studied foreground-background color combinations with 123 university students. Their key findings:
+
+1. **Blue is universally preferred.** Regardless of background color, blue was the most preferred foreground hue (p = 0.0001). This held across red, yellow, cyan, green, and magenta backgrounds.
+2. **Maximum saturation and brightness win.** The BS100 level (100% brightness, 100% saturation) was significantly preferred on almost every background tested.
+3. **Hue, saturation, and brightness all matter.** All three attributes of color were statistically significant in determining preference.
+4. **Preference ranking by hue** (from Fig. 3): Blue > Magenta > Purple > Red > Cyan > Green > Yellow > Yellow-Green.
+5. **Gender and screen position had no effect** on preference choices.
+
+Unlike salience, contrast is not the dominant factor in the preference formula. People preferred blue even on backgrounds where it had poor contrast. Instead, hue drives the score, with saturation and brightness as amplifiers. Achromatic colors (greys, black, white) score low because preference is inherently about chromatic appeal.
+
+### Why both matter
+
+A blue call-to-action scores high on both tabs — people will both notice it and like it. A red CTA scores highest on salience (urgency, alertness) but lower on preference. A desaturated grey content color scores well on salience (if it has good contrast) but poorly on preference (no hue identity).
+
+This tension is the point. Designing effective UI means balancing what grabs attention with what feels pleasant. The two tabs let students observe where these goals align and where they conflict.
+
+---
+
 ## Key Principles
 
 - Color priority is about relative weight, not absolute color value. A color is "loud" or "quiet" only in relation to everything around it.
@@ -80,3 +112,9 @@ Try deliberately breaking the hierarchy: make the surface loud, flatten all prio
 ## About
 
 This tool was built for HCI (Human-Computer Interaction) courses at Universidad del Valle de Guatemala (UVG). It is intended as a hands-on complement to lecture material on visual design principles, giving students a low-friction way to experiment with color hierarchy decisions and observe their effects in a realistic layout context.
+
+---
+
+## References
+
+- Camgoz, N., Yener, C., & Guvenc, D. (2002). Effects of Hue, Saturation, and Brightness on Preference. *Color Research and Application*, 27(3), 199-207. DOI: 10.1002/col.10051
