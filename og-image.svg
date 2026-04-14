@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background gradient: warm off-white matching --bg -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4f1ec"/>
+      <stop offset="100%" stop-color="#ece8e0"/>
+    </linearGradient>
+
+    <!-- Subtle noise/texture via a filter -->
+    <filter id="subtle-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#1a1a1a" flood-opacity="0.10"/>
+    </filter>
+
+    <!-- Swatch shadow -->
+    <filter id="swatch-shadow" x="-5%" y="-5%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#1a1a1a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid lines (very light) -->
+  <g opacity="0.04" stroke="#1a1a1a" stroke-width="1">
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+  </g>
+
+  <!-- ── COLOR HIERARCHY SWATCHES (right side, stacked with decreasing size) ── -->
+
+  <!-- Shadow layer behind swatches -->
+  <g filter="url(#swatch-shadow)">
+
+    <!-- Swatch 1 – Primary / Largest (brand dominant) -->
+    <rect x="690" y="90" width="420" height="132" rx="14"
+          fill="#3D5AFE"/>
+
+    <!-- Swatch 2 – Secondary / Medium -->
+    <rect x="720" y="244" width="360" height="108" rx="14"
+          fill="#00BCD4"/>
+
+    <!-- Swatch 3 – Tertiary / Smaller -->
+    <rect x="750" y="374" width="296" height="86" rx="14"
+          fill="#FF6B35"/>
+
+    <!-- Swatch 4 – Accent / Smallest -->
+    <rect x="780" y="480" width="228" height="64" rx="14"
+          fill="#FFD600"/>
+
+  </g>
+
+  <!-- Priority labels on swatches (monospace, matching Space Mono feel) -->
+  <text x="900" y="166" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="17" font-weight="700" fill="rgba(255,255,255,0.90)"
+        text-anchor="middle" letter-spacing="1">PRIMARY</text>
+
+  <text x="900" y="304" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="16" font-weight="700" fill="rgba(255,255,255,0.90)"
+        text-anchor="middle" letter-spacing="1">SECONDARY</text>
+
+  <text x="898" y="424" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="15" font-weight="700" fill="rgba(255,255,255,0.90)"
+        text-anchor="middle" letter-spacing="1">TERTIARY</text>
+
+  <text x="894" y="519" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="14" font-weight="700" fill="rgba(30,30,30,0.70)"
+        text-anchor="middle" letter-spacing="1">ACCENT</text>
+
+  <!-- Priority arrow / indicator line on left edge of swatches -->
+  <line x1="676" y1="106" x2="676" y2="528" stroke="#1a1a1a" stroke-width="2.5" stroke-opacity="0.18" stroke-dasharray="5,5"/>
+  <!-- Arrow head pointing down (lower priority) -->
+  <polygon points="676,534 670,520 682,520" fill="#1a1a1a" opacity="0.18"/>
+  <!-- Arrow head pointing up (higher priority) -->
+  <polygon points="676,100 670,114 682,114" fill="#1a1a1a" opacity="0.18"/>
+
+  <!-- Small label next to the arrow -->
+  <text x="657" y="322" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="12" fill="#1a1a1a" fill-opacity="0.30" text-anchor="middle"
+        transform="rotate(-90, 657, 322)" letter-spacing="2">PRIORITY</text>
+
+
+  <!-- ── LEFT SIDE: TEXT CONTENT ── -->
+
+  <!-- Eyebrow / label -->
+  <rect x="90" y="118" width="168" height="28" rx="6" fill="#1a1a1a" opacity="0.07"/>
+  <text x="174" y="137" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="12.5" font-weight="700" fill="#1a1a1a" fill-opacity="0.55"
+        text-anchor="middle" letter-spacing="2.5">HCI · UX DESIGN</text>
+
+  <!-- Main title line 1 -->
+  <text x="90" y="228" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="66" font-weight="700" fill="#1a1a1a" letter-spacing="-1.5">Color</text>
+
+  <!-- Main title line 2 -->
+  <text x="90" y="308" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="66" font-weight="700" fill="#1a1a1a" letter-spacing="-1.5">Roles &amp;</text>
+
+  <!-- Main title line 3 – with accent underline -->
+  <text x="90" y="388" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="66" font-weight="700" fill="#3D5AFE" letter-spacing="-1.5">Priority</text>
+
+  <!-- Underline accent under "Priority" -->
+  <rect x="90" y="398" width="330" height="5" rx="3" fill="#3D5AFE" opacity="0.35"/>
+
+  <!-- Subtitle -->
+  <text x="90" y="462" font-family="'DM Sans', system-ui, sans-serif"
+        font-size="22" font-weight="400" fill="#1a1a1a" fill-opacity="0.52"
+        letter-spacing="0.3">An Interactive HCI Teaching Tool</text>
+
+  <!-- Bottom strip / brand bar -->
+  <rect x="0" y="596" width="1200" height="34" fill="#1a1a1a" opacity="0.05"/>
+  <text x="90" y="618" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="12" fill="#1a1a1a" fill-opacity="0.38" letter-spacing="1.5">UVG · HUMAN-COMPUTER INTERACTION</text>
+  <text x="1110" y="618" font-family="'Space Mono', 'Courier New', monospace"
+        font-size="12" fill="#1a1a1a" fill-opacity="0.38" text-anchor="end" letter-spacing="1">color-priority</text>
+
+  <!-- Small decorative dots at bottom-left -->
+  <circle cx="90" cy="548" r="4" fill="#3D5AFE" opacity="0.50"/>
+  <circle cx="106" cy="548" r="4" fill="#00BCD4" opacity="0.50"/>
+  <circle cx="122" cy="548" r="4" fill="#FF6B35" opacity="0.50"/>
+  <circle cx="138" cy="548" r="4" fill="#FFD600" opacity="0.65"/>
+
+</svg>
