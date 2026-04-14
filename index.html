@@ -25,7 +25,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,300&family=Space+Mono:wght@400;700&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
   :root {
     --bg: #f4f1ec;
@@ -206,6 +206,31 @@
     flex: 1;
     accent-color: #555;
     height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+  }
+
+  .priority-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #555;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+
+  .priority-row input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #555;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
   }
 
   .priority-val {
@@ -453,10 +478,48 @@
     margin-bottom: 16px;
   }
 
+  .viz-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .viz-tab {
+    flex: 1;
+    padding: 8px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border: none;
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .viz-tab:not(:last-child) { border-right: 1px solid var(--border); }
+  .viz-tab:hover { color: var(--text); }
+  .viz-tab.active {
+    background: var(--panel-bg);
+    color: var(--text);
+  }
+
+  .viz-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
   .priority-bars {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
   }
 
   .p-bar-row {
@@ -468,7 +531,7 @@
   .p-bar-label {
     font-size: 0.78rem;
     font-weight: 500;
-    width: 100px;
+    width: 90px;
     text-align: right;
     flex-shrink: 0;
   }
@@ -494,6 +557,7 @@
     color: var(--text-muted);
     width: 24px;
     flex-shrink: 0;
+    text-align: right;
   }
 
   /* Tip box */
@@ -673,6 +737,11 @@
 
     <div class="priority-viz">
       <h3>Visual Priority Map</h3>
+      <div class="viz-tabs">
+        <button class="viz-tab active" data-mode="salience" onclick="setVizMode('salience')">Salience</button>
+        <button class="viz-tab" data-mode="preference" onclick="setVizMode('preference')">Preference</button>
+      </div>
+      <div class="viz-desc" id="viz-desc">How likely each color is to grab a user's attention involuntarily. Driven by contrast, saturation, and warm-hue bias — red and yellow alert us fastest.</div>
       <div class="priority-bars" id="priority-bars"></div>
       <div class="tip-box" id="tip-box"></div>
     </div>
@@ -758,6 +827,21 @@ const PRESETS = {
 
 let state = JSON.parse(JSON.stringify(PRESETS.good));
 let mode = 'light';
+let vizMode = 'salience'; // 'salience' or 'preference'
+
+const VIZ_DESCRIPTIONS = {
+  salience: 'How likely each color is to grab a user\u2019s attention involuntarily. Driven by contrast, saturation, and warm-hue bias \u2014 red and yellow alert us fastest.',
+  preference: 'How visually pleasing each color is in context, based on Camg\u00F6z et al. (2002). Blue is universally preferred regardless of background; maximum saturation and brightness increase appeal.',
+};
+
+function setVizMode(m) {
+  vizMode = m;
+  document.querySelectorAll('.viz-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.mode === m);
+  });
+  document.getElementById('viz-desc').textContent = VIZ_DESCRIPTIONS[m];
+  renderBars();
+}
 
 // ── Build Controls ──
 function buildControls() {
@@ -908,25 +992,12 @@ function renderSkeleton() {
   const s = state;
   const svg = document.getElementById('skeleton');
 
-  // Derive opacity-like emphasis from priority (1=subtle, 5=dominant)
-  const f = (role) => {
-    const p = s[role].priority;
-    return s[role].color;
-  };
-
-  // For text/content elements, scale font-weight visually with priority
-  const textOpacity = (role) => 0.35 + (s[role].priority / 5) * 0.65;
-
   const surf = s.surface.color;
   const surfAlt = s.surfaceAlt.color;
   const cont = s.content.color;
   const inter = s.interactive.color;
   const acc = s.accent.color;
   const fb = s.feedback.color;
-
-  const contOp = textOpacity('content');
-  const interOp = textOpacity('interactive');
-  const accOp = textOpacity('accent');
 
   const skeletonMarkup = `
     <!-- Page background -->
@@ -935,64 +1006,64 @@ function renderSkeleton() {
     <!-- Top nav bar -->
     <rect x="0" y="0" width="720" height="56" fill="${surfAlt}" />
     <!-- Logo placeholder -->
-    <rect x="40" y="16" width="80" height="24" rx="6" fill="${cont}" opacity="${contOp * 0.7}" />
+    <rect x="40" y="16" width="80" height="24" rx="6" fill="${cont}" opacity="0.7" />
     <!-- Nav links -->
-    <rect x="340" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
-    <rect x="410" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
-    <rect x="480" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <rect x="340" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="0.45" />
+    <rect x="410" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="0.45" />
+    <rect x="480" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="0.45" />
     <!-- Nav CTA button -->
-    <rect x="590" y="14" width="90" height="30" rx="8" fill="${acc}" opacity="${accOp}" />
+    <rect x="590" y="14" width="90" height="30" rx="8" fill="${acc}" />
     <rect x="608" y="25" width="54" height="8" rx="2" fill="${surf}" opacity="0.9" />
 
     <!-- Hero section -->
-    <rect x="40" y="80" width="380" height="28" rx="5" fill="${cont}" opacity="${contOp}" />
-    <rect x="40" y="118" width="310" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.5}" />
-    <rect x="40" y="140" width="260" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.5}" />
+    <rect x="40" y="80" width="380" height="28" rx="5" fill="${cont}" />
+    <rect x="40" y="118" width="310" height="14" rx="3" fill="${cont}" opacity="0.5" />
+    <rect x="40" y="140" width="260" height="14" rx="3" fill="${cont}" opacity="0.5" />
     <!-- Hero CTA -->
-    <rect x="40" y="175" width="150" height="42" rx="10" fill="${acc}" opacity="${accOp}" />
+    <rect x="40" y="175" width="150" height="42" rx="10" fill="${acc}" />
     <rect x="64" y="191" width="100" height="10" rx="3" fill="${surf}" opacity="0.9" />
     <!-- Secondary button -->
-    <rect x="210" y="175" width="130" height="42" rx="10" fill="none" stroke="${inter}" stroke-width="2" opacity="${interOp}" />
-    <rect x="233" y="191" width="84" height="10" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="210" y="175" width="130" height="42" rx="10" fill="none" stroke="${inter}" stroke-width="2" />
+    <rect x="233" y="191" width="84" height="10" rx="3" fill="${inter}" />
 
     <!-- Hero image placeholder -->
     <rect x="448" y="76" width="232" height="150" rx="12" fill="${surfAlt}" />
-    <circle cx="564" cy="130" r="20" fill="${inter}" opacity="${interOp * 0.3}" />
-    <polygon points="478,200 564,130 648,200" fill="${inter}" opacity="${interOp * 0.15}" />
+    <circle cx="564" cy="130" r="20" fill="${inter}" opacity="0.3" />
+    <polygon points="478,200 564,130 648,200" fill="${inter}" opacity="0.15" />
 
     <!-- Cards section -->
     <!-- Card 1 -->
     <rect x="40" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
-    <rect x="56" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
-    <rect x="56" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="56" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="56" y="338" width="100" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="56" y="356" width="130" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="56" y="418" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="56" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="0.85" />
+    <rect x="56" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="56" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="56" y="338" width="100" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="56" y="356" width="130" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="56" y="418" width="80" height="12" rx="3" fill="${inter}" />
 
     <!-- Card 2 (5 lines) -->
     <rect x="260" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
-    <rect x="276" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
-    <rect x="276" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="276" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="276" y="338" width="120" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="276" y="356" width="145" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="276" y="374" width="105" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="276" y="418" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="276" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="0.85" />
+    <rect x="276" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="276" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="276" y="338" width="120" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="276" y="356" width="145" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="276" y="374" width="105" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="276" y="418" width="80" height="12" rx="3" fill="${inter}" />
 
     <!-- Card 3 (3 lines) -->
     <rect x="480" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
-    <rect x="496" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
-    <rect x="496" y="302" width="130" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="496" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="496" y="338" width="90" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="496" y="418" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="496" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="0.85" />
+    <rect x="496" y="302" width="130" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="496" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="496" y="338" width="90" height="10" rx="2" fill="${cont}" opacity="0.4" />
+    <rect x="496" y="418" width="80" height="12" rx="3" fill="${inter}" />
 
     <!-- Footer -->
     <rect x="0" y="470" width="720" height="50" rx="0" fill="${surfAlt}" />
-    <rect x="40" y="486" width="120" height="10" rx="3" fill="${cont}" opacity="${contOp * 0.3}" />
-    <rect x="540" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
-    <rect x="620" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
+    <rect x="40" y="486" width="120" height="10" rx="3" fill="${cont}" opacity="0.3" />
+    <rect x="540" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="0.4" />
+    <rect x="620" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="0.4" />
 
     <!-- Feedback toast notification -->
     <g class="feedback-toast">
@@ -1041,20 +1112,166 @@ function showFeedbackToast() {
   });
 }
 
+// ── Hue Curves ──
+
+// Salience: how much a hue grabs involuntary attention.
+// Red peak (danger, alertness), blue secondary, green/yellow-green valley.
+function hueSalience(h) {
+  if (h <= 30)        return 1.0;                                // red: peak
+  else if (h <= 60)   return 1.0  - ((h - 30)  / 30) * 0.35;   // orange→yellow: 1.0→0.65
+  else if (h <= 105)  return 0.65 - ((h - 60)  / 45) * 0.35;   // yellow→yellow-green: 0.65→0.3
+  else if (h <= 150)  return 0.3  + ((h - 105) / 45) * 0.05;   // yellow-green→green: 0.3→0.35
+  else if (h <= 195)  return 0.35 + ((h - 150) / 45) * 0.15;   // green→cyan: 0.35→0.5
+  else if (h <= 240)  return 0.5  + ((h - 195) / 45) * 0.2;    // cyan→blue: 0.5→0.7
+  else if (h <= 280)  return 0.7  - ((h - 240) / 40) * 0.1;    // blue→purple: 0.7→0.6
+  else if (h <= 330)  return 0.6;                                // purple/magenta: moderate
+  else                return 0.6  + ((h - 330) / 30) * 0.4;    // magenta→red: 0.6→1.0
+}
+
+// Preference: how pleasing a hue is in context (Camgöz et al., 2002 Fig. 3).
+// Blue peak (universally preferred), magenta/purple high, yellow-green lowest.
+function huePreference(h) {
+  if (h <= 30)        return 0.55;                               // red: moderate
+  else if (h <= 60)   return 0.55 - ((h - 30)  / 30) * 0.15;   // red→yellow: 0.55→0.4
+  else if (h <= 105)  return 0.4  - ((h - 60)  / 45) * 0.1;    // yellow→yellow-green: 0.4→0.3
+  else if (h <= 150)  return 0.3  + ((h - 105) / 45) * 0.15;   // yellow-green→green: 0.3→0.45
+  else if (h <= 195)  return 0.45 + ((h - 150) / 45) * 0.05;   // green→cyan: 0.45→0.5
+  else if (h <= 240)  return 0.5  + ((h - 195) / 45) * 0.5;    // cyan→blue: 0.5→1.0
+  else if (h <= 280)  return 1.0  - ((h - 240) / 40) * 0.25;   // blue→purple: 1.0→0.75
+  else if (h <= 330)  return 0.75 + ((h - 280) / 50) * 0.1;    // purple→magenta: 0.75→0.85
+  else                return 0.85 - ((h - 330) / 30) * 0.3;    // magenta→red: 0.85→0.55
+}
+
+// ── Perceptual Intensity (Salience Mode) ──
+// Computes how visually "loud" a color is against its background.
+// Contrast is the gate — a color that doesn't stand out from the
+// background can't score high no matter how saturated it is.
+// Saturation, brightness, and hue salience then boost colors that do contrast.
+function perceptualIntensity(hex, bgHex) {
+  const hsl = hexToHSL(hex);
+
+  // 1. Contrast against background — the foundation.
+  const cr = contrastRatio(hex, bgHex);
+  const contrastNorm = Math.min(Math.sqrt((cr - 1) / 11), 1); // 0–1, curved
+
+  // 2. Saturation boost — vivid colors pop more than muted ones.
+  const satBoost = 1 + (hsl.s / 100) * 0.45; // 1.0–1.45
+
+  // 3. Brightness boost — Camgöz found brightness equally important as
+  //    saturation for visual impact. Colors at full brightness stand out more.
+  //    Moderate effect: very dark colors are quieter, bright ones louder.
+  const brightBoost = 1 + (hsl.l / 100) * 0.25; // 1.0–1.25
+
+  // 4. Hue salience — red peak, blue secondary, green/yellow-green valley.
+  //    Only applies when the color is actually chromatic (saturated).
+  const h = hsl.h;
+  const hueBoost = 1 + hueSalience(h) * (hsl.s / 100) * 0.4; // 1.0–1.4, gated by saturation
+
+  // Multiplicative: contrast gates everything, boosts amplify
+  const raw = contrastNorm * satBoost * brightBoost * hueBoost;
+
+  // Soft ceiling — an exponential curve that never hard-caps, so
+  // high-scoring colors still differentiate instead of all hitting 100%.
+  // Approaches 100% asymptotically; raw ≈ 0.5 → 63%, 1.0 → 86%, 1.5 → 95%.
+  const score = 100 * (1 - Math.exp(-raw * 2));
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+// ── Preference Score ──
+// How pleasing a color is in context, based on Camgöz et al. (2002).
+// Unlike salience, contrast is NOT the dominant factor — people preferred
+// blue regardless of background. Hue drives the score; saturation and
+// brightness amplify it (BS100 was universally the most preferred level).
+// Achromatic colors score low since preference is inherently about hue appeal.
+function preferenceScore(hex, bgHex) {
+  const hsl = hexToHSL(hex);
+  const h = hsl.h;
+  const sat = hsl.s / 100; // 0–1
+  const light = hsl.l / 100; // 0–1
+
+  // 1. Hue preference is the primary driver (Camgöz Fig. 3).
+  const hPref = huePreference(h);
+
+  // 2. Saturation — Camgöz: maximum saturation strongly preferred.
+  //    Desaturated colors lose hue identity and score low.
+  const satScore = sat; // linear 0–1
+
+  // 3. Brightness — Camgöz: maximum brightness strongly preferred (BS100).
+  //    Map lightness so that both very dark and very light saturated colors
+  //    score well (think bright blue L=50 vs bright yellow L=90), but
+  //    muddy mid-darks score lower.
+  const brightScore = 0.5 + sat * (light * 0.5); // 0.5–1.0 when saturated
+
+  // 4. Contrast plays a minor supporting role — a small bonus for readability
+  //    but NOT the gating factor it is in salience mode.
+  const cr = contrastRatio(hex, bgHex);
+  const contrastBonus = 1 + Math.min((cr - 1) / 20, 0.2); // 1.0–1.2, gentle
+
+  // Weighted combination: hue dominant, sat/bright amplify
+  // For achromatic colors (sat ≈ 0), hue doesn't matter — score is low.
+  const chromatic = hPref * satScore; // 0–1, zero if desaturated
+  const raw = (chromatic * 0.6 + brightScore * 0.25 + satScore * 0.15) * contrastBonus;
+
+  const score = 100 * (1 - Math.exp(-raw * 2.8));
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+// Preference variant for surface roles — how "appealing" a background is.
+// Neutral surfaces score mid-range (inoffensive), vivid surfaces can score
+// high if they use a preferred hue, low if they use a disliked one.
+function surfacePreference(hex) {
+  const hsl = hexToHSL(hex);
+  const sat = hsl.s / 100;
+  if (sat < 0.05) {
+    // Achromatic surfaces: neutral preference (not liked, not disliked)
+    return Math.round(30 + (hsl.l / 100) * 15); // 30–45%
+  }
+  const hPref = huePreference(hsl.h);
+  const raw = hPref * sat * 0.7 + sat * 0.3;
+  return Math.max(0, Math.min(100, Math.round(raw * 100)));
+}
+
+// Surface/background intensity — how "loud" a background color is on its own.
+// A neutral white/black surface is quiet; a saturated colorful surface is loud.
+function surfaceIntensity(hex) {
+  const hsl = hexToHSL(hex);
+  // Saturation is the primary driver — a grey bg is quiet, a vivid bg is loud
+  const satFactor = hsl.s / 100; // 0–1
+  // Brightness extremes (very dark or very light) are quieter backgrounds;
+  // mid-lightness saturated colors are the loudest surfaces
+  const brightFactor = 1 - Math.abs(hsl.l - 50) / 50; // peaks at L=50
+  const raw = satFactor * 0.7 + satFactor * brightFactor * 0.3;
+  return Math.max(0, Math.min(100, Math.round(raw * 100)));
+}
+
 // ── Priority Bars ──
 function renderBars() {
   const wrap = document.getElementById('priority-bars');
-  const sorted = ROLES.map(r => ({ ...r, ...state[r.id] })).sort((a, b) => b.priority - a.priority);
+  const bg = state.surface.color;
+  const items = ROLES.map(r => {
+    const s = state[r.id];
+    const isSurface = r.id === 'surface' || r.id === 'surfaceAlt';
+    let intensity;
+    if (vizMode === 'preference') {
+      intensity = isSurface ? surfacePreference(s.color) : preferenceScore(s.color, bg);
+    } else {
+      intensity = isSurface ? surfaceIntensity(s.color) : perceptualIntensity(s.color, bg);
+    }
+    return { ...r, ...s, intensity };
+  }).sort((a, b) => b.priority - a.priority);
 
-  wrap.innerHTML = sorted.map(r => `
-    <div class="p-bar-row">
-      <span class="p-bar-label">${r.label}</span>
-      <div class="p-bar-track">
-        <div class="p-bar-fill" style="width:${r.priority * 20}%;background:${r.color};${isLight(r.color) ? 'border:1px solid #ccc;' : ''}"></div>
+  wrap.innerHTML = items.map(r => {
+    const barBorder = isLight(r.color) ? 'border:1px solid #ccc;' : '';
+    return `
+      <div class="p-bar-row">
+        <span class="p-bar-label">${r.label}</span>
+        <div class="p-bar-track">
+          <div class="p-bar-fill" style="width:${r.intensity}%;background:${r.color};${barBorder}"></div>
+        </div>
+        <span class="p-bar-num">${r.intensity}%</span>
       </div>
-      <span class="p-bar-num">${r.priority}</span>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // ── Smart Tips ──
