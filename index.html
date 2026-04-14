@@ -403,6 +403,20 @@
     height: auto;
   }
 
+  .feedback-toast {
+    transform: translateX(240px);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+  }
+  .feedback-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .feedback-toast.hiding {
+    transform: translateX(240px);
+    opacity: 0;
+  }
+
   /* ── Priority Visualization ── */
   .priority-viz {
     background: var(--panel-bg);
@@ -903,14 +917,14 @@ function renderSkeleton() {
     <!-- Top nav bar -->
     <rect x="0" y="0" width="720" height="56" fill="${surfAlt}" />
     <!-- Logo placeholder -->
-    <rect x="20" y="16" width="80" height="24" rx="6" fill="${cont}" opacity="${contOp * 0.7}" />
+    <rect x="40" y="16" width="80" height="24" rx="6" fill="${cont}" opacity="${contOp * 0.7}" />
     <!-- Nav links -->
-    <rect x="320" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
-    <rect x="385" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
-    <rect x="450" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <rect x="340" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <rect x="410" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <rect x="480" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
     <!-- Nav CTA button -->
-    <rect x="610" y="14" width="90" height="30" rx="8" fill="${acc}" opacity="${accOp}" />
-    <rect x="628" y="25" width="54" height="8" rx="2" fill="${surf}" opacity="0.9" />
+    <rect x="590" y="14" width="90" height="30" rx="8" fill="${acc}" opacity="${accOp}" />
+    <rect x="608" y="25" width="54" height="8" rx="2" fill="${surf}" opacity="0.9" />
 
     <!-- Hero section -->
     <rect x="40" y="80" width="380" height="28" rx="5" fill="${cont}" opacity="${contOp}" />
@@ -920,13 +934,13 @@ function renderSkeleton() {
     <rect x="40" y="175" width="150" height="42" rx="10" fill="${acc}" opacity="${accOp}" />
     <rect x="64" y="191" width="100" height="10" rx="3" fill="${surf}" opacity="0.9" />
     <!-- Secondary button -->
-    <rect x="205" y="175" width="130" height="42" rx="10" fill="none" stroke="${inter}" stroke-width="2" opacity="${interOp}" />
-    <rect x="228" y="191" width="84" height="10" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="210" y="175" width="130" height="42" rx="10" fill="none" stroke="${inter}" stroke-width="2" opacity="${interOp}" />
+    <rect x="233" y="191" width="84" height="10" rx="3" fill="${inter}" opacity="${interOp}" />
 
     <!-- Hero image placeholder -->
-    <rect x="460" y="76" width="232" height="150" rx="12" fill="${surfAlt}" />
-    <circle cx="576" cy="130" r="20" fill="${inter}" opacity="${interOp * 0.3}" />
-    <polygon points="490,200 576,130 660,200" fill="${inter}" opacity="${interOp * 0.15}" />
+    <rect x="448" y="76" width="232" height="150" rx="12" fill="${surfAlt}" />
+    <circle cx="564" cy="130" r="20" fill="${inter}" opacity="${interOp * 0.3}" />
+    <polygon points="478,200 564,130 648,200" fill="${inter}" opacity="${interOp * 0.15}" />
 
     <!-- Cards section -->
     <!-- Card 1 -->
@@ -935,32 +949,41 @@ function renderSkeleton() {
     <rect x="56" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
     <rect x="56" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
     <rect x="56" y="338" width="100" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="56" y="370" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
-    <!-- Feedback badge on card 1 -->
-    <rect x="160" y="400" width="64" height="22" rx="6" fill="${fb}" opacity="0.85" />
-    <rect x="170" y="407" width="44" height="8" rx="2" fill="${surf}" opacity="0.9" />
+    <rect x="56" y="356" width="130" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="56" y="418" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
 
-    <!-- Card 2 -->
+    <!-- Card 2 (5 lines) -->
     <rect x="260" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
     <rect x="276" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
     <rect x="276" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
     <rect x="276" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
     <rect x="276" y="338" width="120" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="276" y="370" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="276" y="356" width="145" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="276" y="374" width="105" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="276" y="418" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
 
-    <!-- Card 3 -->
+    <!-- Card 3 (3 lines) -->
     <rect x="480" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
     <rect x="496" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
     <rect x="496" y="302" width="130" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
     <rect x="496" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="496" y="338" width="110" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
-    <rect x="496" y="370" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+    <rect x="496" y="338" width="90" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="496" y="418" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
 
     <!-- Footer -->
     <rect x="0" y="470" width="720" height="50" rx="0" fill="${surfAlt}" />
     <rect x="40" y="486" width="120" height="10" rx="3" fill="${cont}" opacity="${contOp * 0.3}" />
     <rect x="540" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
-    <rect x="616" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
+    <rect x="620" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
+
+    <!-- Feedback toast notification -->
+    <g class="feedback-toast">
+      <rect x="488" y="68" width="192" height="48" rx="10" fill="${fb}" opacity="0.92" />
+      <circle cx="510" cy="92" r="8" fill="${surf}" opacity="0.85" />
+      <rect x="528" y="82" width="100" height="8" rx="2" fill="${surf}" opacity="0.9" />
+      <rect x="528" y="96" width="64" height="6" rx="2" fill="${surf}" opacity="0.5" />
+      <rect x="644" y="84" width="24" height="16" rx="4" fill="${surf}" opacity="0.25" />
+    </g>
   `;
 
   svg.innerHTML = skeletonMarkup;
@@ -974,6 +997,30 @@ function renderSkeleton() {
   const modalFrame = document.getElementById('modal-skeleton-frame');
   if (frame) frame.style.background = surf;
   if (modalFrame) modalFrame.style.background = surf;
+
+  // Trigger feedback toast animation
+  showFeedbackToast();
+}
+
+let toastTimer = null;
+function showFeedbackToast() {
+  document.querySelectorAll('.feedback-toast').forEach(t => {
+    t.classList.remove('show', 'hiding');
+  });
+  clearTimeout(toastTimer);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.feedback-toast').forEach(t => {
+        t.classList.add('show');
+      });
+      toastTimer = setTimeout(() => {
+        document.querySelectorAll('.feedback-toast').forEach(t => {
+          t.classList.remove('show');
+          t.classList.add('hiding');
+        });
+      }, 2000);
+    });
+  });
 }
 
 // ── Priority Bars ──
@@ -1114,6 +1161,10 @@ function closePreviewModal(e) {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closePreviewModal();
 });
+
+// Re-trigger toast on preview click
+document.getElementById('skeleton-frame').addEventListener('click', showFeedbackToast);
+document.getElementById('modal-skeleton-frame').addEventListener('click', showFeedbackToast);
 
 buildControls();
 render();
