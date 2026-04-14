@@ -1,6 +1,6 @@
 # Color Priority in Interface Design
 
-[Live Demo](https://dennisaldana.com/color-priority)
+[Live Demo](https://denn1s.github.io/color-priority/)
 
 ---
 
