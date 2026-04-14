@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Role & Priority. This is an HCI Teaching Tool</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,300&family=Space+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f4f1ec;
+    --panel-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #777;
+    --border: #e0dcd6;
+    --shadow: rgba(0,0,0,0.06);
+  }
+
+  body.dark-mode {
+    --bg: #1a1a1a;
+    --panel-bg: #252525;
+    --text: #e8e8e8;
+    --text-muted: #999;
+    --border: #3a3a3a;
+    --shadow: rgba(0,0,0,0.25);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* ── Controls Panel ── */
+  .controls {
+    background: var(--panel-bg);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px var(--shadow);
+    position: sticky;
+    top: 24px;
+    align-self: start;
+  }
+
+  .controls h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+
+  .role-group {
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .role-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .role-label {
+    font-weight: 700;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .role-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: #eee;
+    color: #888;
+  }
+
+  .role-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    line-height: 1.45;
+    font-style: italic;
+  }
+
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-picker-wrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+  .color-picker-wrap:hover { border-color: #aaa; }
+
+  .color-picker-wrap input[type="color"] {
+    position: absolute;
+    top: -6px; left: -6px;
+    width: 54px; height: 54px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .hex-input {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .hex-input:focus { outline: none; border-color: #999; }
+
+  /* Priority slider */
+  .priority-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .priority-row label {
+    font-size: 0.72rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .priority-row input[type="range"] {
+    flex: 1;
+    accent-color: #555;
+    height: 4px;
+  }
+
+  .priority-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text);
+    min-width: 16px;
+    text-align: right;
+  }
+
+  /* Theme toggle (corner) */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--panel-bg);
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .theme-toggle:hover { border-color: #aaa; color: var(--text); transform: scale(1.1); }
+
+  /* Examples section */
+  .examples-section {
+    margin-bottom: 18px;
+  }
+
+  .examples-section h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+  }
+
+  .presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .preset-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .preset-btn:hover { border-color: #aaa; color: var(--text); }
+
+  .auto-priority-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px dashed #b8b0a4;
+    background: linear-gradient(135deg, #faf8f4 0%, #f0ece4 100%);
+    color: #6b5f50;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .auto-priority-btn:hover {
+    border-color: #8a7e6e;
+    background: linear-gradient(135deg, #f5f0e8 0%, #e8e2d6 100%);
+    color: #4a4030;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  }
+  .auto-priority-btn:active { transform: translateY(0); }
+  .auto-priority-btn .sparkle { font-size: 1rem; }
+
+  .auto-priority-btn.flash {
+    animation: flashGlow 0.6s ease;
+  }
+
+  @keyframes flashGlow {
+    0% { box-shadow: 0 0 0 0 rgba(74, 158, 62, 0.4); }
+    40% { box-shadow: 0 0 0 8px rgba(74, 158, 62, 0.15); border-color: #4a9e3e; }
+    100% { box-shadow: 0 0 0 0 rgba(74, 158, 62, 0); }
+  }
+
+  /* ── Preview Area ── */
+  .preview-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .preview-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+  }
+
+  .expand-btn {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+  }
+  .expand-btn:hover {
+    color: var(--text);
+    border-color: #8a7e6e;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .expand-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ── Fullscreen Modal ── */
+  .preview-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+  .preview-modal-overlay.open {
+    display: flex;
+  }
+  .preview-modal {
+    background: var(--panel-bg);
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+    width: 100%;
+    max-width: calc(100vw - 48px);
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .modal-body .skeleton-frame {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: none;
+  }
+  .modal-body .skeleton-frame svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .skeleton-frame {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px var(--shadow);
+    transition: background 0.35s;
+  }
+
+  /* Skeleton SVG internals */
+  .skeleton-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ── Priority Visualization ── */
+  .priority-viz {
+    background: var(--panel-bg);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+
+  .priority-viz h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .priority-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .p-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .p-bar-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    width: 100px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .p-bar-track {
+    flex: 1;
+    height: 28px;
+    background: var(--bg);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .p-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s;
+  }
+
+  .p-bar-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    width: 24px;
+    flex-shrink: 0;
+  }
+
+  /* Tip box */
+  .tip-box {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: #fff8e7;
+    border: 1px solid #e6a817;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #6b5a1e;
+    min-height: 48px;
+    transition: all 0.35s;
+  }
+
+  .tip-box.good { background: #eefbe7; border: 1px solid #4caf50; color: #2e5c1a; }
+  .tip-box.warn { background: #fff3e0; border: 1px solid #ff9800; color: #6b3a00; }
+  .tip-box.bad  { background: #ffeaea; border: 1px solid #e53935; color: #6b1a1a; }
+
+  body.dark-mode .tip-box       { background: #2a2518; border: 1px solid #e6a817; color: #d4b96a; }
+  body.dark-mode .tip-box.good  { background: #1a2e14; border: 1px solid #4caf50; color: #8fcc7a; }
+  body.dark-mode .tip-box.warn  { background: #2e2010; border: 1px solid #ff9800; color: #d4a04a; }
+  body.dark-mode .tip-box.bad   { background: #2e1414; border: 1px solid #e53935; color: #e08080; }
+
+  body.dark-mode .auto-priority-btn {
+    border-color: #4a4a4a;
+    background: linear-gradient(135deg, #2a2a2a 0%, #333 100%);
+    color: #bbb;
+  }
+  body.dark-mode .auto-priority-btn:hover {
+    border-color: #666;
+    background: linear-gradient(135deg, #333 0%, #3a3a3a 100%);
+    color: #ddd;
+  }
+
+  body.dark-mode .role-tag { background: #3a3a3a; color: #999; }
+
+  /* ── Contrast Ratios ── */
+  .contrast-section {
+    background: var(--panel-bg);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px var(--shadow);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .contrast-section h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .contrast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    flex-grow: 1;
+  }
+
+  .contrast-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+
+  .contrast-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .contrast-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .contrast-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .contrast-ratio {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .contrast-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+  }
+
+  .badge-aaa { background: #d4edda; color: #155724; }
+  .badge-aa  { background: #d4edda; color: #155724; }
+  .badge-fail { background: #f8d7da; color: #721c24; }
+
+  body.dark-mode .badge-aaa { background: #1a3a1a; color: #8fcc7a; }
+  body.dark-mode .badge-aa  { background: #1a3a1a; color: #8fcc7a; }
+  body.dark-mode .badge-fail { background: #3a1a1a; color: #e08080; }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">☀</button>
+
+<header>
+  <h1>Color Roles &amp; Priority</h1>
+  <p>Assign a color and a visual priority (1–5) to each role. Watch how different choices create or break visual hierarchy in the skeleton preview.</p>
+</header>
+
+<div class="layout">
+  <!-- Controls -->
+  <div class="controls">
+    <h2>Color Roles</h2>
+
+    <div id="role-controls"></div>
+
+    <button class="auto-priority-btn" id="auto-priority-btn" onclick="autoPriority()">
+      <span class="sparkle">✦</span> Suggest priorities
+    </button>
+
+    <div class="examples-section">
+      <h2>Examples</h2>
+      <div class="presets">
+        <button class="preset-btn" onclick="loadPreset('good')">Good</button>
+        <button class="preset-btn" onclick="loadPreset('bad')">Bad</button>
+        <button class="preset-btn" onclick="loadPreset('darkPalette')">Dark Mode</button>
+        <button class="preset-btn" onclick="loadPreset('highContrast')">HiContrast</button>
+        <button class="preset-btn" onclick="loadPreset('monotone')">Monotone</button>
+        <button class="preset-btn" onclick="loadPreset('singleColor')">Single</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-area">
+    <div>
+      <div class="preview-header">
+        <div class="preview-label">Live Preview</div>
+        <button class="expand-btn" onclick="openPreviewModal()" title="Expand preview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          Expand
+        </button>
+      </div>
+      <div class="skeleton-frame" id="skeleton-frame">
+        <svg id="skeleton" viewBox="0 0 720 520" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+
+    <div class="priority-viz">
+      <h3>Visual Priority Map</h3>
+      <div class="priority-bars" id="priority-bars"></div>
+      <div class="tip-box" id="tip-box"></div>
+    </div>
+
+    <div class="contrast-section">
+      <h3>Contrast Ratios (WCAG)</h3>
+      <div class="contrast-grid" id="contrast-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Preview Modal -->
+<div class="preview-modal-overlay" id="preview-modal" onclick="closePreviewModal(event)">
+  <div class="preview-modal" onclick="event.stopPropagation()">
+    <div class="modal-body">
+      <div class="skeleton-frame" id="modal-skeleton-frame">
+        <svg id="modal-skeleton" viewBox="0 0 720 520" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROLES = [
+  { id: 'surface',     label: 'Surface',     desc: 'Backgrounds & containers. This is the canvas everything sits on.', tag: 'LOW' },
+  { id: 'surfaceAlt',  label: 'Surface Alt',  desc: 'Navigation Bars, Cards, sidebars. Secondary containers.', tag: 'LOW' },
+  { id: 'content',     label: 'Content',      desc: 'Body text, headings, icons. This is primary readable info.', tag: 'MED' },
+  { id: 'interactive', label: 'Interactive',   desc: 'Buttons, links, controls. These are things users tap or click.', tag: 'HIGH' },
+  { id: 'accent',      label: 'Accent/CTA',   desc: 'Main call-to-action, brand highlight. This is the loudest element.', tag: 'HIGH' },
+  { id: 'feedback',    label: 'Feedback',      desc: 'Success, error, warning signals. Things that show up and must grab attention temporarily.', tag: 'CONTEXT' },
+];
+
+const PRESETS = {
+  good: {
+    surface:     { color: '#FFFFFF', priority: 1 },
+    surfaceAlt:  { color: '#F5F5F0', priority: 1 },
+    content:     { color: '#1A1A1A', priority: 3 },
+    interactive: { color: '#2563EB', priority: 4 },
+    accent:      { color: '#E63946', priority: 5 },
+    feedback:    { color: '#16A34A', priority: 2 },
+  },
+  bad: {
+    surface:     { color: '#FF6B6B', priority: 5 },
+    surfaceAlt:  { color: '#FFE66D', priority: 4 },
+    content:     { color: '#C0C0C0', priority: 1 },
+    interactive: { color: '#CCCCCC', priority: 2 },
+    accent:      { color: '#D4D4D4', priority: 1 },
+    feedback:    { color: '#FF0000', priority: 5 },
+  },
+  darkPalette: {
+    surface:     { color: '#121212', priority: 1 },
+    surfaceAlt:  { color: '#1E1E1E', priority: 1 },
+    content:     { color: '#E0E0E0', priority: 3 },
+    interactive: { color: '#64B5F6', priority: 4 },
+    accent:      { color: '#FF6090', priority: 5 },
+    feedback:    { color: '#66BB6A', priority: 2 },
+  },
+  highContrast: {
+    surface:     { color: '#000000', priority: 1 },
+    surfaceAlt:  { color: '#1A1A1A', priority: 1 },
+    content:     { color: '#FFFFFF', priority: 3 },
+    interactive: { color: '#FFFF00', priority: 4 },
+    accent:      { color: '#FF3333', priority: 5 },
+    feedback:    { color: '#00FF66', priority: 2 },
+  },
+  monotone: {
+    surface:     { color: '#F0F0F0', priority: 1 },
+    surfaceAlt:  { color: '#D8D8D8', priority: 1 },
+    content:     { color: '#1A1A1A', priority: 3 },
+    interactive: { color: '#4A4A4A', priority: 4 },
+    accent:      { color: '#000000', priority: 5 },
+    feedback:    { color: '#888888', priority: 2 },
+  },
+  singleColor: {
+    surface:     { color: '#FFFFFF', priority: 1 },
+    surfaceAlt:  { color: '#F0F4FF', priority: 1 },
+    content:     { color: '#1A1A2E', priority: 3 },
+    interactive: { color: '#2563EB', priority: 4 },
+    accent:      { color: '#2563EB', priority: 5 },
+    feedback:    { color: '#2563EB', priority: 2 },
+  },
+};
+
+let state = JSON.parse(JSON.stringify(PRESETS.good));
+let mode = 'light';
+
+// ── Build Controls ──
+function buildControls() {
+  const wrap = document.getElementById('role-controls');
+  wrap.innerHTML = '';
+  ROLES.forEach(r => {
+    const s = state[r.id];
+    const div = document.createElement('div');
+    div.className = 'role-group';
+    div.innerHTML = `
+      <div class="role-header">
+        <span class="role-label">${r.label} <span class="role-tag">${r.tag}</span></span>
+      </div>
+      <div class="role-desc">${r.desc}</div>
+      <div class="color-row">
+        <div class="color-picker-wrap">
+          <input type="color" value="${s.color}" data-role="${r.id}" onchange="onColor(this)">
+        </div>
+        <input class="hex-input" type="text" value="${s.color}" data-role="${r.id}" oninput="onHex(this)" maxlength="7">
+      </div>
+      <div class="priority-row">
+        <label>Priority</label>
+        <input type="range" min="1" max="5" value="${s.priority}" data-role="${r.id}" oninput="onPriority(this)">
+        <span class="priority-val" id="pval-${r.id}">${s.priority}</span>
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function onColor(el) {
+  state[el.dataset.role].color = el.value;
+  el.closest('.role-group').querySelector('.hex-input').value = el.value;
+  render();
+}
+
+function onHex(el) {
+  let v = el.value.trim();
+  if (/^[0-9a-fA-F]{6}$/.test(v)) {
+    v = '#' + v;
+    el.value = v;
+  }
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    state[el.dataset.role].color = v;
+    el.closest('.role-group').querySelector('input[type="color"]').value = v;
+    render();
+  }
+}
+
+function onPriority(el) {
+  state[el.dataset.role].priority = parseInt(el.value);
+  document.getElementById('pval-' + el.dataset.role).textContent = el.value;
+  render();
+}
+
+function setMode(m) {
+  mode = m;
+  document.body.classList.toggle('dark-mode', m === 'dark');
+  document.getElementById('theme-toggle').textContent = m === 'dark' ? '☾' : '☀';
+  localStorage.setItem('ui-theme', m);
+  render();
+}
+
+function toggleTheme() {
+  setMode(mode === 'light' ? 'dark' : 'light');
+}
+
+function loadPreset(name) {
+  state = JSON.parse(JSON.stringify(PRESETS[name]));
+  buildControls();
+  render();
+}
+
+// ── Auto Priority ──
+// Keeps the student's chosen colors, assigns the "generally accepted" hierarchy.
+// Also uses color analysis to nudge: if their accent color is actually muted,
+// it still gets priority 5 (so they see the role matters) but the tip will warn them.
+const RECOMMENDED = {
+  surface: 1,
+  surfaceAlt: 1,
+  content: 3,
+  interactive: 4,
+  accent: 5,
+  feedback: 2,
+};
+
+function autoPriority() {
+  // Animate the button
+  const btn = document.getElementById('auto-priority-btn');
+  btn.classList.remove('flash');
+  void btn.offsetWidth; // force reflow
+  btn.classList.add('flash');
+
+  // Analyze colors and assign smart priorities
+  ROLES.forEach(r => {
+    let rec = RECOMMENDED[r.id];
+
+    // Slight intelligence: analyze the color's visual weight
+    const hsl = hexToHSL(state[r.id].color);
+
+    // If their "accent" color is very desaturated, still give it 5
+    // but the tip system will catch that it's a weak accent.
+    // If their "surface" is highly saturated, still drop it to 1
+    // so they can see the hierarchy correction.
+
+    // Small nudge: if content color is very saturated/vibrant, bump to 3
+    // (it's already readable AND eye-catching)
+    if (r.id === 'content' && hsl.s > 60) {
+      rec = 4; // content that's also colorful can be slightly louder
+    }
+
+    state[r.id].priority = rec;
+  });
+
+  // Animate sliders smoothly
+  buildControls();
+  render();
+}
+
+function hexToHSL(hex) {
+  let r = parseInt(hex.slice(1,3),16)/255;
+  let g = parseInt(hex.slice(3,5),16)/255;
+  let b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h, s, l = (max+min)/2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max) {
+      case r: h = ((g-b)/d + (g<b?6:0))/6; break;
+      case g: h = ((b-r)/d + 2)/6; break;
+      case b: h = ((r-g)/d + 4)/6; break;
+    }
+  }
+  return { h: Math.round(h*360), s: Math.round(s*100), l: Math.round(l*100) };
+}
+
+// ── Render Skeleton ──
+function render() {
+  renderSkeleton();
+  renderBars();
+  renderTip();
+  renderContrast();
+}
+
+function renderSkeleton() {
+  const s = state;
+  const svg = document.getElementById('skeleton');
+
+  // Derive opacity-like emphasis from priority (1=subtle, 5=dominant)
+  const f = (role) => {
+    const p = s[role].priority;
+    return s[role].color;
+  };
+
+  // For text/content elements, scale font-weight visually with priority
+  const textOpacity = (role) => 0.35 + (s[role].priority / 5) * 0.65;
+
+  const surf = s.surface.color;
+  const surfAlt = s.surfaceAlt.color;
+  const cont = s.content.color;
+  const inter = s.interactive.color;
+  const acc = s.accent.color;
+  const fb = s.feedback.color;
+
+  const contOp = textOpacity('content');
+  const interOp = textOpacity('interactive');
+  const accOp = textOpacity('accent');
+
+  const skeletonMarkup = `
+    <!-- Page background -->
+    <rect width="720" height="520" rx="10" fill="${surf}" />
+
+    <!-- Top nav bar -->
+    <rect x="0" y="0" width="720" height="56" fill="${surfAlt}" />
+    <!-- Logo placeholder -->
+    <rect x="20" y="16" width="80" height="24" rx="6" fill="${cont}" opacity="${contOp * 0.7}" />
+    <!-- Nav links -->
+    <rect x="320" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <rect x="385" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <rect x="450" y="22" width="50" height="12" rx="3" fill="${cont}" opacity="${contOp * 0.45}" />
+    <!-- Nav CTA button -->
+    <rect x="610" y="14" width="90" height="30" rx="8" fill="${acc}" opacity="${accOp}" />
+    <rect x="628" y="25" width="54" height="8" rx="2" fill="${surf}" opacity="0.9" />
+
+    <!-- Hero section -->
+    <rect x="40" y="80" width="380" height="28" rx="5" fill="${cont}" opacity="${contOp}" />
+    <rect x="40" y="118" width="310" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.5}" />
+    <rect x="40" y="140" width="260" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.5}" />
+    <!-- Hero CTA -->
+    <rect x="40" y="175" width="150" height="42" rx="10" fill="${acc}" opacity="${accOp}" />
+    <rect x="64" y="191" width="100" height="10" rx="3" fill="${surf}" opacity="0.9" />
+    <!-- Secondary button -->
+    <rect x="205" y="175" width="130" height="42" rx="10" fill="none" stroke="${inter}" stroke-width="2" opacity="${interOp}" />
+    <rect x="228" y="191" width="84" height="10" rx="3" fill="${inter}" opacity="${interOp}" />
+
+    <!-- Hero image placeholder -->
+    <rect x="460" y="76" width="232" height="150" rx="12" fill="${surfAlt}" />
+    <circle cx="576" cy="130" r="20" fill="${inter}" opacity="${interOp * 0.3}" />
+    <polygon points="490,200 576,130 660,200" fill="${inter}" opacity="${interOp * 0.15}" />
+
+    <!-- Cards section -->
+    <!-- Card 1 -->
+    <rect x="40" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
+    <rect x="56" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
+    <rect x="56" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="56" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="56" y="338" width="100" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="56" y="370" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+    <!-- Feedback badge on card 1 -->
+    <rect x="160" y="400" width="64" height="22" rx="6" fill="${fb}" opacity="0.85" />
+    <rect x="170" y="407" width="44" height="8" rx="2" fill="${surf}" opacity="0.9" />
+
+    <!-- Card 2 -->
+    <rect x="260" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
+    <rect x="276" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
+    <rect x="276" y="302" width="140" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="276" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="276" y="338" width="120" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="276" y="370" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+
+    <!-- Card 3 -->
+    <rect x="480" y="260" width="200" height="180" rx="12" fill="${surfAlt}" />
+    <rect x="496" y="278" width="168" height="14" rx="3" fill="${cont}" opacity="${contOp * 0.85}" />
+    <rect x="496" y="302" width="130" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="496" y="320" width="155" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="496" y="338" width="110" height="10" rx="2" fill="${cont}" opacity="${contOp * 0.4}" />
+    <rect x="496" y="370" width="80" height="12" rx="3" fill="${inter}" opacity="${interOp}" />
+
+    <!-- Footer -->
+    <rect x="0" y="470" width="720" height="50" rx="0" fill="${surfAlt}" />
+    <rect x="40" y="486" width="120" height="10" rx="3" fill="${cont}" opacity="${contOp * 0.3}" />
+    <rect x="540" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
+    <rect x="616" y="486" width="60" height="10" rx="3" fill="${inter}" opacity="${interOp * 0.4}" />
+  `;
+
+  svg.innerHTML = skeletonMarkup;
+
+  // Sync modal SVG
+  const modalSvg = document.getElementById('modal-skeleton');
+  if (modalSvg) modalSvg.innerHTML = skeletonMarkup;
+
+  // Sync skeleton-frame background
+  const frame = document.getElementById('skeleton-frame');
+  const modalFrame = document.getElementById('modal-skeleton-frame');
+  if (frame) frame.style.background = surf;
+  if (modalFrame) modalFrame.style.background = surf;
+}
+
+// ── Priority Bars ──
+function renderBars() {
+  const wrap = document.getElementById('priority-bars');
+  const sorted = ROLES.map(r => ({ ...r, ...state[r.id] })).sort((a, b) => b.priority - a.priority);
+
+  wrap.innerHTML = sorted.map(r => `
+    <div class="p-bar-row">
+      <span class="p-bar-label">${r.label}</span>
+      <div class="p-bar-track">
+        <div class="p-bar-fill" style="width:${r.priority * 20}%;background:${r.color};${isLight(r.color) ? 'border:1px solid #ccc;' : ''}"></div>
+      </div>
+      <span class="p-bar-num">${r.priority}</span>
+    </div>
+  `).join('');
+}
+
+// ── Smart Tips ──
+function renderTip() {
+  const tip = document.getElementById('tip-box');
+  const issues = [];
+
+  // CTA should be highest
+  const maxP = Math.max(...ROLES.map(r => state[r.id].priority));
+  if (state.accent.priority < maxP) {
+    issues.push("Your CTA/Accent isn't the loudest element. Users might miss the main action.");
+  }
+
+  // Surface should be lowest
+  if (state.surface.priority > 2) {
+    issues.push("Surface priority is high. Backgrounds are competing with content for attention.");
+  }
+
+  // Content should be readable (mid-range)
+  if (state.content.priority < 2) {
+    issues.push("Content priority is very low. Body text might feel invisible or hard to read.");
+  }
+
+  // Interactive shouldn't exceed CTA
+  if (state.interactive.priority > state.accent.priority) {
+    issues.push("Interactive elements are louder than your CTA. Secondary actions are upstaging the primary one.");
+  }
+
+  // Check if everything is the same priority
+  const allSame = ROLES.every(r => state[r.id].priority === state[ROLES[0].id].priority);
+  if (allSame) {
+    issues.push("Everything has the same priority. There's no visual hierarchy at all. Nothing stands out.");
+  }
+
+  if (issues.length === 0) {
+    tip.className = 'tip-box good';
+    tip.textContent = '✓ Nice hierarchy! The CTA is the loudest, surfaces stay quiet, and content is readable. This is a solid priority assignment.';
+  } else if (issues.length <= 1) {
+    tip.className = 'tip-box warn';
+    tip.innerHTML = '⚠ ' + issues[0];
+  } else {
+    tip.className = 'tip-box bad';
+    tip.innerHTML = '✗ Multiple hierarchy issues:<br>• ' + issues.join('<br>• ');
+  }
+}
+
+function isLight(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return (r*299 + g*587 + b*114) / 1000 > 180;
+}
+
+// ── Contrast Ratios ──
+function relativeLuminance(hex) {
+  let r = parseInt(hex.slice(1,3),16)/255;
+  let g = parseInt(hex.slice(3,5),16)/255;
+  let b = parseInt(hex.slice(5,7),16)/255;
+  r = r <= 0.03928 ? r/12.92 : Math.pow((r+0.055)/1.055, 2.4);
+  g = g <= 0.03928 ? g/12.92 : Math.pow((g+0.055)/1.055, 2.4);
+  b = b <= 0.03928 ? b/12.92 : Math.pow((b+0.055)/1.055, 2.4);
+  return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+
+function contrastRatio(hex1, hex2) {
+  const l1 = relativeLuminance(hex1);
+  const l2 = relativeLuminance(hex2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function wcagBadge(ratio) {
+  if (ratio >= 7) return '<span class="contrast-badge badge-aaa">AAA</span>';
+  if (ratio >= 4.5) return '<span class="contrast-badge badge-aa">AA</span>';
+  if (ratio >= 3) return '<span class="contrast-badge badge-aa">AA Large</span>';
+  return '<span class="contrast-badge badge-fail">FAIL</span>';
+}
+
+function renderContrast() {
+  const grid = document.getElementById('contrast-grid');
+  const bg = state.surface.color;
+
+  const pairs = [
+    { id: 'content',     label: 'Content',     desc: 'on Surface' },
+    { id: 'interactive', label: 'Interactive',  desc: 'on Surface' },
+    { id: 'accent',      label: 'Accent/CTA',  desc: 'on Surface' },
+    { id: 'feedback',    label: 'Feedback',     desc: 'on Surface' },
+    { id: 'content',     label: 'Content',      desc: 'on Surface Alt', bgOverride: state.surfaceAlt.color },
+  ];
+
+  grid.innerHTML = pairs.map(p => {
+    const fg = state[p.id].color;
+    const pairBg = p.bgOverride || bg;
+    const ratio = contrastRatio(fg, pairBg);
+    const textCol = isLight(pairBg) ? fg : fg;
+    return `
+      <div class="contrast-card">
+        <div class="contrast-swatch" style="background:${pairBg};color:${fg};border:1px solid var(--border);">Aa</div>
+        <div class="contrast-info">
+          <span class="contrast-label">${p.label} <span style="color:var(--text-muted);font-weight:400;font-size:0.72rem">${p.desc}</span></span>
+          <span class="contrast-ratio">${ratio.toFixed(1)}:1 ${wcagBadge(ratio)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Init ──
+const savedTheme = localStorage.getItem('ui-theme');
+if (savedTheme) setMode(savedTheme);
+// ── Fullscreen Preview Modal ──
+function openPreviewModal() {
+  document.getElementById('preview-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePreviewModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('preview-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePreviewModal();
+});
+
+buildControls();
+render();
+</script>
+</body>
+</html>
